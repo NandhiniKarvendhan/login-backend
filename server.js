@@ -18,7 +18,7 @@ admin.initializeApp({
     type: process.env.FIREBASE_TYPE,
     project_id: process.env.FIREBASE_PROJECT_ID,
     private_key_id: process.env.FIREBASE_PRIVATE_KEY_ID,
-    private_key: process.env.FIREBASE_PRIVATE_KEY.replace(/\\n/g, '\n'),
+    private_key: process.env.FIREBASE_PRIVATE_KEY.replace(/\\n/g, "\n"),
     client_email: process.env.FIREBASE_CLIENT_EMAIL,
     client_id: process.env.FIREBASE_CLIENT_ID,
     auth_uri: process.env.FIREBASE_AUTH_URI,
@@ -27,7 +27,6 @@ admin.initializeApp({
     client_x509_cert_url: process.env.FIREBASE_CLIENT_X509_CERT_URL,
   }),
 });
-
 
 // Middleware
 app.use(express.json());
@@ -42,21 +41,27 @@ app.use((req, res, next) => {
 // CORS Configuration
 const allowedOrigins = [
   "http://localhost:3000", // React Development URL
-  process.env.FRONTEND_URL, // Use environment variable for frontend production URL
+  process.env.FRONTEND_URL, // Frontend Production URL from environment
 ];
+
 app.use(
   cors({
     origin: (origin, callback) => {
-      // Allow requests with no origin (e.g., mobile apps or Postman)
       if (!origin || allowedOrigins.includes(origin)) {
-        callback(null, true);
+        callback(null, true); // Allow access
       } else {
+        console.error(`Blocked by CORS policy: ${origin}`);
         callback(new Error("CORS policy does not allow access from this origin."));
       }
     },
-    credentials: true, // Allow credentials if needed
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"], // Allowed HTTP methods
+    allowedHeaders: ["Content-Type", "Authorization"], // Allowed headers
+    credentials: true, // Allow cookies and credentials
   })
 );
+
+// Preflight requests
+app.options("*", cors());
 
 // Connect to MongoDB
 mongoose
@@ -124,6 +129,7 @@ app.post("/login", async (req, res) => {
   }
 });
 
+// Google Sign-In
 app.post("/google-signin", async (req, res) => {
   const { idToken } = req.body;
 
@@ -146,4 +152,4 @@ app.post("/google-signin", async (req, res) => {
 });
 
 // Start server
-app.listen(PORT, "0.0.0.0", () => console.log(`Server running on ${PORT}`));
+app.listen(PORT, "0.0.0.0", () => console.log(`Server running on port ${PORT}`));
