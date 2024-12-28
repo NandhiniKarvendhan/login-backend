@@ -1,3 +1,4 @@
 node_modules
 .env
 package-lock.json
+config/smpp-client-demo-firebase-adminsdk-pgw80-483384bce8.json
