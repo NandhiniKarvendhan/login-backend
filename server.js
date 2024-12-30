@@ -12,7 +12,7 @@ const app = express();
 const PORT = process.env.PORT || 8000;
 const MONGO_URI = process.env.MONGO_URI;
 
-// Firebase Admin initialization
+// Firebase Admin Initialization
 admin.initializeApp({
   credential: admin.credential.cert({
     type: process.env.FIREBASE_TYPE,
@@ -29,9 +29,9 @@ admin.initializeApp({
 });
 
 // Middleware
-app.use(express.json());
+app.use(express.json()); // Parse JSON payloads
 
-// COOP and COEP Headers
+// COOP and COEP Headers for enhanced security
 app.use((req, res, next) => {
   res.setHeader("Cross-Origin-Opener-Policy", "same-origin-allow-popups");
   res.setHeader("Cross-Origin-Embedder-Policy", "require-corp");
@@ -40,7 +40,8 @@ app.use((req, res, next) => {
 
 // CORS Configuration
 const allowedOrigins = [
-  "http://localhost:3000", // React Development URL
+  "http://localhost:3000",
+   "https://sms-gateway-demo.onrender.com", // React Development URL
   process.env.FRONTEND_URL, // Frontend Production URL from environment
 ];
 
@@ -60,20 +61,20 @@ app.use(
   })
 );
 
-// Preflight requests
+// Handle Preflight Requests
 app.options("*", cors());
 
 // Connect to MongoDB
 mongoose
   .connect(MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true })
-  .then(() => console.log("MongoDB connected"))
+  .then(() => console.log("MongoDB connected successfully"))
   .catch((err) => console.error("MongoDB connection error:", err));
 
 // Routes
 
-// Health Check
+// Health Check Route
 app.get("/", (req, res) => {
-  res.send("Login Backend Running!");
+  res.status(200).send("Login Backend is running!");
 });
 
 // Register User
@@ -151,5 +152,7 @@ app.post("/google-signin", async (req, res) => {
   }
 });
 
-// Start server
-app.listen(PORT, "0.0.0.0", () => console.log(`Server running on port ${PORT}`));
+// Start Server
+app.listen(PORT, "0.0.0.0", () =>
+  console.log(`Server running on http://localhost:${PORT} or ${process.env.FRONTEND_URL}`)
+);
