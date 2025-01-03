@@ -79,7 +79,8 @@ app.get("/", (req, res) => {
 
 // Register User
 app.post("/register", async (req, res) => {
-  const { username, password } = req.body;
+  const { email, password } = req.body; // Accept email
+  const username = email; // Map email to username
 
   if (!username || !password) {
     return res.status(400).json({ success: false, message: "Username and password are required!" });
@@ -101,6 +102,7 @@ app.post("/register", async (req, res) => {
     res.status(500).json({ success: false, message: "Internal server error." });
   }
 });
+
 
 // Login User
 app.post("/login", async (req, res) => {
